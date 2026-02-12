@@ -1,9 +1,200 @@
-vless://15b41b2c-7ba5-4500-8f9e-9ca2b7e45a9d@104.18.32.47:443?encryption=none&security=tls&sni=afrcloud4.mmv.kr&insecure=0&allowInsecure=0&type=ws&host=afrcloud4.mmv.kr&path=%2F178.128.86.3%3D443#SG%20-%20DigitalOcean%20LLC%20%5BVLESS-TLS%5D
-vless://3f79cfa7-b6d8-4264-a748-89b0c7e33a1a@104.21.69.44:443?encryption=none&security=tls&sni=afrcloud4.mmv.kr&insecure=0&allowInsecure=0&type=ws&host=afrcloud4.mmv.kr&path=%2F104.43.91.69%3D443#SG%20-%20Microsoft%20Corporation%20%5BVLESS-TLS%5D
-vless://af99369c-a13e-4063-a467-eb103ef2b5e2@162.159.152.4:443?encryption=none&security=tls&sni=afrcloud3.mmv.kr&insecure=0&allowInsecure=0&type=ws&host=afrcloud3.mmv.kr&path=%2F129.150.58.86%3D57621#SG%20-%20Oracle%20Corporation%20%5BVLESS-TLS%5D
-vless://3f79cfa7-b6d8-4264-a748-89b0c7e33a1a@172.67.204.84:443?encryption=none&security=tls&sni=afrcloud4.mmv.kr&insecure=0&allowInsecure=0&type=ws&host=afrcloud4.mmv.kr&path=%2F5.223.47.32%3D443#SG%20-%20Hetzner%20Online%20GmbH%20%5BVLESS-TLS%5D
-vless://893c86f9-bcac-4e7b-8364-fe6397b6e38a@185.18.250.245:443?encryption=none&security=tls&sni=afrcloud5.c01.kr&insecure=0&allowInsecure=0&type=ws&host=afrcloud5.c01.kr&path=%2F136.243.211.104%3D443#US%20-%20OVH%20US%20LLC%20%5BVLESS-TLS%5D
-vless://fc52f6d4-ea38-4c5d-943f-37eeaab27973@188.114.98.0:443?encryption=none&security=tls&sni=afrcloud3.c01.kr&insecure=0&allowInsecure=0&type=ws&host=afrcloud3.c01.kr&path=%2F47.88.24.237%3D10443#US%20-%20Alibaba%20Cloud%20US%20%5BVLESS-TLS%5D
-vless://a35a773e-53a2-42c5-9978-d2b50e2728cf@104.18.185.26:443?encryption=none&security=tls&sni=afrcloud3.c01.kr&insecure=0&allowInsecure=0&type=ws&host=afrcloud3.c01.kr&path=%2F52.76.110.129%3D20001#SG%20-%20Amazon%20Technologies%20Inc%20%5BVLESS-TLS%5D
-vless://d9192912-491b-4d1c-8c1a-d1dd8c3a086f@104.21.11.91:443?encryption=none&security=tls&sni=afrcloud3.mmv.kr&insecure=0&allowInsecure=0&type=ws&host=afrcloud3.mmv.kr&path=%2F194.127.193.124%3D24467#SG%20-%20Greencloud%20LLC%20%5BVLESS-TLS%5D
-vless://6b161a18-4642-439e-a9ba-e4e23b3fb9f0@208.103.161.52:443?encryption=none&security=tls&sni=afrcloud5.c01.kr&insecure=0&allowInsecure=0&type=ws&host=afrcloud5.c01.kr&path=%2F15.204.57.47%3D7267#US%20-%20Cloudflare%20London%20LLC%20%5BVLESS-TLS%5D
+{
+  "remarks": "DE - Cloudflare",
+  "version": {
+    "min": "25.10.15"
+  },
+  "log": {
+    "loglevel": "warning"
+  },
+  "dns": {
+    "servers": [
+      {
+        "address": "https://8.8.8.8/dns-query",
+        "tag": "remote-dns"
+      },
+      {
+        "address": "8.8.8.8",
+        "domains": [
+          "full:awmir24.kasnonieo822.workers.dev"
+        ],
+        "skipFallback": true
+      }
+    ],
+    "queryStrategy": "UseIP",
+    "tag": "dns"
+  },
+  "inbounds": [
+    {
+      "listen": "127.0.0.1",
+      "port": 10808,
+      "protocol": "socks",
+      "settings": {
+        "auth": "noauth",
+        "udp": true
+      },
+      "sniffing": {
+        "destOverride": [
+          "http",
+          "tls"
+        ],
+        "enabled": true,
+        "routeOnly": true
+      },
+      "tag": "mixed-in"
+    },
+    {
+      "listen": "127.0.0.1",
+      "port": 10853,
+      "protocol": "dokodemo-door",
+      "settings": {
+        "address": "1.1.1.1",
+        "network": "tcp,udp",
+        "port": 53
+      },
+      "tag": "dns-in"
+    }
+  ],
+  "outbounds": [
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "awmir24.kasnonieo822.workers.dev",
+            "port": 2087,
+            "users": [
+              {
+                "id": "7a5d69b9-83ce-4999-8cc0-f9de136b73dd",
+                "encryption": "none"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "wsSettings": {
+          "host": "awmir24.kasnonieo822.workers.dev",
+          "path": "/eyJqdW5rIjoiRDBZZ2Vjd2pLN1NJaiIsInByb3RvY29sIjoidmwiLCJtb2RlIjoicHJveHlpcCIsInBhbmVsSVBzIjpbXX0=?ed=2560"
+        },
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "aWMIR24.KAsNoniEo822.WoRkeRs.dEV",
+          "fingerprint": "chrome",
+          "alpn": [
+            "http/1.1"
+          ],
+          "allowInsecure": false
+        },
+        "sockopt": {
+          "domainStrategy": "UseIP",
+          "happyEyeballs": {
+            "tryDelayMs": 250,
+            "prioritizeIPv6": false,
+            "interleave": 2,
+            "maxConcurrentTry": 4
+          }
+        }
+      },
+      "tag": "proxy"
+    },
+    {
+      "protocol": "dns",
+      "settings": {
+        "nonIPQuery": "reject"
+      },
+      "tag": "dns-out"
+    },
+    {
+      "protocol": "freedom",
+      "settings": {
+        "domainStrategy": "UseIP"
+      },
+      "tag": "direct"
+    },
+    {
+      "protocol": "blackhole",
+      "settings": {
+        "response": {
+          "type": "http"
+        }
+      },
+      "tag": "block"
+    }
+  ],
+  "routing": {
+    "domainStrategy": "IPIfNonMatch",
+    "rules": [
+      {
+        "inboundTag": [
+          "mixed-in"
+        ],
+        "port": 53,
+        "outboundTag": "dns-out",
+        "type": "field"
+      },
+      {
+        "inboundTag": [
+          "dns-in"
+        ],
+        "outboundTag": "dns-out",
+        "type": "field"
+      },
+      {
+        "inboundTag": [
+          "remote-dns"
+        ],
+        "outboundTag": "proxy",
+        "type": "field"
+      },
+      {
+        "inboundTag": [
+          "dns"
+        ],
+        "outboundTag": "direct",
+        "type": "field"
+      },
+      {
+        "domain": [
+          "geosite:private"
+        ],
+        "outboundTag": "direct",
+        "type": "field"
+      },
+      {
+        "ip": [
+          "geoip:private"
+        ],
+        "outboundTag": "direct",
+        "type": "field"
+      },
+      {
+        "network": "udp",
+        "outboundTag": "block",
+        "type": "field"
+      },
+      {
+        "network": "tcp",
+        "outboundTag": "proxy",
+        "type": "field"
+      }
+    ]
+  },
+  "policy": {
+    "levels": {
+      "0": {
+        "connIdle": 300,
+        "handshake": 4,
+        "uplinkOnly": 1,
+        "downlinkOnly": 1
+      }
+    },
+    "system": {
+      "statsOutboundUplink": true,
+      "statsOutboundDownlink": true
+    }
+  },
+  "stats": {}
+}
+
+----------------------------------------
