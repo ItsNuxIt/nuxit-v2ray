@@ -1,200 +1,393 @@
 [
-{
-  "remarks": "DE - Cloudflare",
-  "version": {
-    "min": "25.10.15"
-  },
-  "log": {
-    "loglevel": "warning"
-  },
-  "dns": {
-    "servers": [
-      {
-        "address": "https://8.8.8.8/dns-query",
-        "tag": "remote-dns"
-      },
-      {
-        "address": "8.8.8.8",
-        "domains": [
-          "full:awmir24.kasnonieo822.workers.dev"
+    {
+        "remarks": "DE - Cloudflare I",
+        "version": {
+            "min": "25.10.15"
+        },
+        "log": {
+            "loglevel": "warning"
+        },
+        "dns": {
+            "servers": [
+                {
+                    "address": "https://8.8.8.8/dns-query",
+                    "tag": "remote-dns"
+                },
+                {
+                    "address": "8.8.8.8",
+                    "domains": [
+                        "full:plain-violet-4382.mistranull2026.workers.dev"
+                    ],
+                    "skipFallback": true
+                }
+            ],
+            "queryStrategy": "UseIP",
+            "tag": "dns"
+        },
+        "inbounds": [
+            {
+                "listen": "127.0.0.1",
+                "port": 10808,
+                "protocol": "socks",
+                "settings": {
+                    "auth": "noauth",
+                    "udp": true
+                },
+                "sniffing": {
+                    "destOverride": [
+                        "http",
+                        "tls"
+                    ],
+                    "enabled": true,
+                    "routeOnly": true
+                },
+                "tag": "mixed-in"
+            },
+            {
+                "listen": "127.0.0.1",
+                "port": 10853,
+                "protocol": "dokodemo-door",
+                "settings": {
+                    "address": "1.1.1.1",
+                    "network": "tcp,udp",
+                    "port": 53
+                },
+                "tag": "dns-in"
+            }
         ],
-        "skipFallback": true
-      }
-    ],
-    "queryStrategy": "UseIP",
-    "tag": "dns"
-  },
-  "inbounds": [
-    {
-      "listen": "127.0.0.1",
-      "port": 10808,
-      "protocol": "socks",
-      "settings": {
-        "auth": "noauth",
-        "udp": true
-      },
-      "sniffing": {
-        "destOverride": [
-          "http",
-          "tls"
+        "outbounds": [
+            {
+                "protocol": "vless",
+                "settings": {
+                    "vnext": [
+                        {
+                            "address": "plain-violet-4382.mistranull2026.workers.dev",
+                            "port": 443,
+                            "users": [
+                                {
+                                    "id": "d9d4ead8-6918-42d0-a69d-7794af3e8d20",
+                                    "encryption": "none"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "streamSettings": {
+                    "network": "ws",
+                    "wsSettings": {
+                        "host": "plain-violet-4382.mistranull2026.workers.dev",
+                        "path": "/eyJqdW5rIjoiQ3BkcG5mTkwiLCJwcm90b2NvbCI6InZsIiwibW9kZSI6InByb3h5aXAiLCJwYW5lbElQcyI6W119?ed=2560"
+                    },
+                    "security": "tls",
+                    "tlsSettings": {
+                        "serverName": "pLAIN-viOLeT-4382.miSTRanULL2026.wOrkERs.dEv",
+                        "fingerprint": "chrome",
+                        "alpn": [
+                            "http/1.1"
+                        ],
+                        "allowInsecure": false
+                    },
+                    "sockopt": {
+                        "domainStrategy": "UseIP",
+                        "happyEyeballs": {
+                            "tryDelayMs": 250,
+                            "prioritizeIPv6": false,
+                            "interleave": 2,
+                            "maxConcurrentTry": 4
+                        }
+                    }
+                },
+                "tag": "proxy"
+            },
+            {
+                "protocol": "dns",
+                "settings": {
+                    "nonIPQuery": "reject"
+                },
+                "tag": "dns-out"
+            },
+            {
+                "protocol": "freedom",
+                "settings": {
+                    "domainStrategy": "UseIP"
+                },
+                "tag": "direct"
+            },
+            {
+                "protocol": "blackhole",
+                "settings": {
+                    "response": {
+                        "type": "http"
+                    }
+                },
+                "tag": "block"
+            }
         ],
-        "enabled": true,
-        "routeOnly": true
-      },
-      "tag": "mixed-in"
-    },
-    {
-      "listen": "127.0.0.1",
-      "port": 10853,
-      "protocol": "dokodemo-door",
-      "settings": {
-        "address": "1.1.1.1",
-        "network": "tcp,udp",
-        "port": 53
-      },
-      "tag": "dns-in"
-    }
-  ],
-  "outbounds": [
-    {
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "awmir24.kasnonieo822.workers.dev",
-            "port": 2087,
-            "users": [
-              {
-                "id": "7a5d69b9-83ce-4999-8cc0-f9de136b73dd",
-                "encryption": "none"
-              }
+        "routing": {
+            "domainStrategy": "IPIfNonMatch",
+            "rules": [
+                {
+                    "inboundTag": [
+                        "mixed-in"
+                    ],
+                    "port": 53,
+                    "outboundTag": "dns-out",
+                    "type": "field"
+                },
+                {
+                    "inboundTag": [
+                        "dns-in"
+                    ],
+                    "outboundTag": "dns-out",
+                    "type": "field"
+                },
+                {
+                    "inboundTag": [
+                        "remote-dns"
+                    ],
+                    "outboundTag": "proxy",
+                    "type": "field"
+                },
+                {
+                    "inboundTag": [
+                        "dns"
+                    ],
+                    "outboundTag": "direct",
+                    "type": "field"
+                },
+                {
+                    "domain": [
+                        "geosite:private"
+                    ],
+                    "outboundTag": "direct",
+                    "type": "field"
+                },
+                {
+                    "ip": [
+                        "geoip:private"
+                    ],
+                    "outboundTag": "direct",
+                    "type": "field"
+                },
+                {
+                    "network": "udp",
+                    "outboundTag": "block",
+                    "type": "field"
+                },
+                {
+                    "network": "tcp",
+                    "outboundTag": "proxy",
+                    "type": "field"
+                }
             ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "ws",
-        "wsSettings": {
-          "host": "awmir24.kasnonieo822.workers.dev",
-          "path": "/eyJqdW5rIjoiRDBZZ2Vjd2pLN1NJaiIsInByb3RvY29sIjoidmwiLCJtb2RlIjoicHJveHlpcCIsInBhbmVsSVBzIjpbXX0=?ed=2560"
         },
-        "security": "tls",
-        "tlsSettings": {
-          "serverName": "aWMIR24.KAsNoniEo822.WoRkeRs.dEV",
-          "fingerprint": "chrome",
-          "alpn": [
-            "http/1.1"
-          ],
-          "allowInsecure": false
+        "policy": {
+            "levels": {
+                "0": {
+                    "connIdle": 300,
+                    "handshake": 4,
+                    "uplinkOnly": 1,
+                    "downlinkOnly": 1
+                }
+            },
+            "system": {
+                "statsOutboundUplink": true,
+                "statsOutboundDownlink": true
+            }
         },
-        "sockopt": {
-          "domainStrategy": "UseIP",
-          "happyEyeballs": {
-            "tryDelayMs": 250,
-            "prioritizeIPv6": false,
-            "interleave": 2,
-            "maxConcurrentTry": 4
-          }
-        }
-      },
-      "tag": "proxy"
+        "stats": {}
     },
-    {
-      "protocol": "dns",
-      "settings": {
-        "nonIPQuery": "reject"
-      },
-      "tag": "dns-out"
+   {
+        "remarks": "DE - Ckoudflare II",
+        "version": {
+            "min": "25.10.15"
+        },
+        "log": {
+            "loglevel": "warning"
+        },
+        "dns": {
+            "servers": [
+                {
+                    "address": "https://8.8.8.8/dns-query",
+                    "tag": "remote-dns"
+                },
+                {
+                    "address": "8.8.8.8",
+                    "domains": [
+                        "full:plain-violet-4382.mistranull2026.workers.dev"
+                    ],
+                    "skipFallback": true
+                }
+            ],
+            "queryStrategy": "UseIP",
+            "tag": "dns"
+        },
+        "inbounds": [
+            {
+                "listen": "127.0.0.1",
+                "port": 10808,
+                "protocol": "socks",
+                "settings": {
+                    "auth": "noauth",
+                    "udp": true
+                },
+                "sniffing": {
+                    "destOverride": [
+                        "http",
+                        "tls"
+                    ],
+                    "enabled": true,
+                    "routeOnly": true
+                },
+                "tag": "mixed-in"
+            },
+            {
+                "listen": "127.0.0.1",
+                "port": 10853,
+                "protocol": "dokodemo-door",
+                "settings": {
+                    "address": "1.1.1.1",
+                    "network": "tcp,udp",
+                    "port": 53
+                },
+                "tag": "dns-in"
+            }
+        ],
+        "outbounds": [
+            {
+                "protocol": "trojan",
+                "settings": {
+                    "servers": [
+                        {
+                            "address": "plain-violet-4382.mistranull2026.workers.dev",
+                            "port": 443,
+                            "password": "aQZG8(Fd"
+                        }
+                    ]
+                },
+                "streamSettings": {
+                    "network": "ws",
+                    "wsSettings": {
+                        "host": "plain-violet-4382.mistranull2026.workers.dev",
+                        "path": "/eyJqdW5rIjoiWHp5V3AzRUdQIiwicHJvdG9jb2wiOiJ0ciIsIm1vZGUiOiJwcm94eWlwIiwicGFuZWxJUHMiOltdfQ==?ed=2560"
+                    },
+                    "security": "tls",
+                    "tlsSettings": {
+                        "serverName": "PlAin-VIOLET-4382.mIStRanull2026.workErs.deV",
+                        "fingerprint": "chrome",
+                        "alpn": [
+                            "http/1.1"
+                        ],
+                        "allowInsecure": false
+                    },
+                    "sockopt": {
+                        "domainStrategy": "UseIP",
+                        "happyEyeballs": {
+                            "tryDelayMs": 250,
+                            "prioritizeIPv6": false,
+                            "interleave": 2,
+                            "maxConcurrentTry": 4
+                        }
+                    }
+                },
+                "tag": "proxy"
+            },
+            {
+                "protocol": "dns",
+                "settings": {
+                    "nonIPQuery": "reject"
+                },
+                "tag": "dns-out"
+            },
+            {
+                "protocol": "freedom",
+                "settings": {
+                    "domainStrategy": "UseIP"
+                },
+                "tag": "direct"
+            },
+            {
+                "protocol": "blackhole",
+                "settings": {
+                    "response": {
+                        "type": "http"
+                    }
+                },
+                "tag": "block"
+            }
+        ],
+        "routing": {
+            "domainStrategy": "IPIfNonMatch",
+            "rules": [
+                {
+                    "inboundTag": [
+                        "mixed-in"
+                    ],
+                    "port": 53,
+                    "outboundTag": "dns-out",
+                    "type": "field"
+                },
+                {
+                    "inboundTag": [
+                        "dns-in"
+                    ],
+                    "outboundTag": "dns-out",
+                    "type": "field"
+                },
+                {
+                    "inboundTag": [
+                        "remote-dns"
+                    ],
+                    "outboundTag": "proxy",
+                    "type": "field"
+                },
+                {
+                    "inboundTag": [
+                        "dns"
+                    ],
+                    "outboundTag": "direct",
+                    "type": "field"
+                },
+                {
+                    "domain": [
+                        "geosite:private"
+                    ],
+                    "outboundTag": "direct",
+                    "type": "field"
+                },
+                {
+                    "ip": [
+                        "geoip:private"
+                    ],
+                    "outboundTag": "direct",
+                    "type": "field"
+                },
+                {
+                    "network": "udp",
+                    "outboundTag": "block",
+                    "type": "field"
+                },
+                {
+                    "network": "tcp",
+                    "outboundTag": "proxy",
+                    "type": "field"
+                }
+            ]
+        },
+        "policy": {
+            "levels": {
+                "0": {
+                    "connIdle": 300,
+                    "handshake": 4,
+                    "uplinkOnly": 1,
+                    "downlinkOnly": 1
+                }
+            },
+            "system": {
+                "statsOutboundUplink": true,
+                "statsOutboundDownlink": true
+            }
+        },
+        "stats": {}
     },
-    {
-      "protocol": "freedom",
-      "settings": {
-        "domainStrategy": "UseIP"
-      },
-      "tag": "direct"
-    },
-    {
-      "protocol": "blackhole",
-      "settings": {
-        "response": {
-          "type": "http"
-        }
-      },
-      "tag": "block"
-    }
-  ],
-  "routing": {
-    "domainStrategy": "IPIfNonMatch",
-    "rules": [
-      {
-        "inboundTag": [
-          "mixed-in"
-        ],
-        "port": 53,
-        "outboundTag": "dns-out",
-        "type": "field"
-      },
-      {
-        "inboundTag": [
-          "dns-in"
-        ],
-        "outboundTag": "dns-out",
-        "type": "field"
-      },
-      {
-        "inboundTag": [
-          "remote-dns"
-        ],
-        "outboundTag": "proxy",
-        "type": "field"
-      },
-      {
-        "inboundTag": [
-          "dns"
-        ],
-        "outboundTag": "direct",
-        "type": "field"
-      },
-      {
-        "domain": [
-          "geosite:private"
-        ],
-        "outboundTag": "direct",
-        "type": "field"
-      },
-      {
-        "ip": [
-          "geoip:private"
-        ],
-        "outboundTag": "direct",
-        "type": "field"
-      },
-      {
-        "network": "udp",
-        "outboundTag": "block",
-        "type": "field"
-      },
-      {
-        "network": "tcp",
-        "outboundTag": "proxy",
-        "type": "field"
-      }
-    ]
-  },
-  "policy": {
-    "levels": {
-      "0": {
-        "connIdle": 300,
-        "handshake": 4,
-        "uplinkOnly": 1,
-        "downlinkOnly": 1
-      }
-    },
-    "system": {
-      "statsOutboundUplink": true,
-      "statsOutboundDownlink": true
-    }
-  },
-  "stats": {}
-}
 ]
